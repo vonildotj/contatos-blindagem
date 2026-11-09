@@ -29,7 +29,10 @@ jobs:
 
       - name: Inicializar Capacitor e Android
         run: |
-          npx cap init "Contatos Blindagem" "com.vonildoj.blindagem" --web-dir .
+          mkdir www
+          cp index.html clientes.js "Logo Blindagem.jpeg" www/
+          cp -r icons www/
+          npx cap init "Contatos Blindagem" "com.vonildoj.blindagem" --web-dir www
           npx cap add android
           npx cap sync
 
