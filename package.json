@@ -1,0 +1,13 @@
+{
+  "name": "contatos-blindagem",
+  "version": "1.0.0",
+  "description": "App de contatos Blindagem",
+  "scripts": {
+    "build": "echo 'Build concluído'"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.0",
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/core": "^7.0.0"
+  }
+}
