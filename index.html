@@ -1,0 +1,1808 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contatos Clientes Blindagem</title>
+  
+  <link rel="icon" type="image/jpeg" href="Logo Blindagem.jpeg">
+  <link rel="apple-touch-icon" href="Logo Blindagem.jpeg">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0f172a">
+  <link rel="manifest" href="manifest.json">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: { 50:'#f8fafc',100:'#f1f5f9',200:'#e2e8f0',300:'#cbd5e1',400:'#94a3b8',500:'#64748b',600:'#475569',700:'#334155',800:'#1e293b',900:'#0f172a' },
+            accent:{ 50:'#fffbeb',100:'#fef3c7',200:'#fde68a',300:'#fcd34d',400:'#fbbf24',500:'#f59e0b',600:'#d97706',700:'#b45309',800:'#92400e',900:'#78350f' }
+          },
+          boxShadow: {
+            'soft': '0 1px 2px rgba(15,23,42,0.04), 0 4px 16px rgba(15,23,42,0.06)',
+            'card': '0 1px 3px rgba(15,23,42,0.05), 0 10px 30px -10px rgba(15,23,42,0.12)',
+            'card-hover': '0 4px 6px rgba(15,23,42,0.05), 0 20px 40px -12px rgba(15,23,42,0.18)'
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    body {
+      font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 0% -10%, rgba(251,191,36,0.08), transparent 60%),
+        radial-gradient(900px 500px at 100% 0%, rgba(51,65,85,0.08), transparent 55%),
+        #f8fafc;
+      background-attachment: fixed;
+    }
+    [contenteditable="true"]:focus {
+      outline: 2px solid #f59e0b; background-color: #fffbeb; border-radius: 6px;
+      box-shadow: 0 0 0 4px rgba(245,158,11,0.12);
+      transition: box-shadow .15s ease, background-color .15s ease;
+    }
+    tr.dragging { opacity: 0.5; background-color: #f1f5f9; }
+    .read-only-mode [contenteditable="true"] { pointer-events: none; }
+    .collapsed-forced .client-details { display: none !important; }
+    .expanded-forced .client-details { display: block !important; }
+    .client-block { transition: transform .2s ease, box-shadow .25s ease, border-color .2s ease; }
+    .client-block:hover { transform: translateY(-2px); }
+    .client-block > div:first-child {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #334155 100%) !important;
+      position: relative; overflow: hidden;
+    }
+    .client-block > div:first-child::after {
+      content: ""; position: absolute; inset: 0;
+      background: radial-gradient(600px 100px at 100% 0%, rgba(251,191,36,0.15), transparent 60%);
+      pointer-events: none;
+    }
+    table thead tr { background: linear-gradient(to bottom, #f8fafc, #f1f5f9) !important; }
+    button, a.inline-flex, a.flex {
+      transition: transform .12s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease, border-color .2s ease;
+    }
+    button:active { transform: translateY(1px); }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(#cbd5e1, #94a3b8); border-radius: 999px; border: 2px solid #f8fafc; }
+    ::-webkit-scrollbar-thumb:hover { background: linear-gradient(#94a3b8, #64748b); }
+    #unlockModal, #securityModal, #editContactModal, #mapModal, #pasteModal {
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    }
+    #accessGateOverlay {
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    }
+    @keyframes fadeInToast {
+      from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+    @keyframes shakeAccess {
+      0%,100% { transform: translateX(0); }
+      25%     { transform: translateX(-8px); }
+      75%     { transform: translateX(8px); }
+    }
+    .shake { animation: shakeAccess .28s ease 2; }
+    .loc-bar {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 16px;
+      background: linear-gradient(to right, #f8fafc, #f1f5f9);
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 12px;
+    }
+    .loc-bar .loc-icon {
+      width: 24px; height: 24px; border-radius: 6px;
+      display: inline-flex; align-items: center; justify-content: center;
+      font-size: 11px; flex-shrink: 0;
+    }
+    .loc-bar .loc-icon.map { background: #fee2e2; color: #dc2626; }
+    .loc-bar .loc-icon.link { background: #dbeafe; color: #2563eb; }
+    .loc-bar .loc-label {
+      font-weight: 700; color: #334155; text-transform: uppercase;
+      font-size: 10px; letter-spacing: 0.4px;
+    }
+    .loc-bar .loc-value {
+      padding: 4px 8px; border-radius: 6px; color: #0f172a; font-weight: 500;
+      border: 1px solid transparent; transition: all .15s;
+      min-height: 24px; display: block;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .loc-bar .loc-value:hover { border-color: #cbd5e1; background: #fff; }
+    .loc-bar .loc-value.empty { color: #94a3b8; font-style: italic; font-weight: 400; }
+	/* Estilos do Modo Escuro */
+    body.dark-mode {
+      background: #090d16 !important;
+      color: #f1f5f9 !important;
+    }
+    body.dark-mode header,
+    body.dark-mode .client-block,
+    body.dark-mode #accessGateCard,
+    body.dark-mode #unlockModal > div,
+    body.dark-mode #securityModal > div,
+    body.dark-mode #editContactModal > div,
+    body.dark-mode #mapModal > div,
+    body.dark-mode #pasteModal > div {
+      background-color: #1e293b !important;
+      border-color: #334155 !important;
+      color: #f1f5f9 !important;
+    }
+    body.dark-mode #searchInput {
+      background-color: #0f172a !important;
+      border-color: #334155 !important;
+      color: #f1f5f9 !important;
+    }
+    body.dark-mode table thead tr {
+      background: linear-gradient(to bottom, #0f172a, #1e293b) !important;
+      color: #94a3b8 !important;
+    }
+    body.dark-mode table tbody tr {
+      border-color: #334155 !important;
+    }
+    body.dark-mode table tbody tr:hover {
+      background-color: #334155/40 !important;
+    }
+    body.dark-mode .loc-bar {
+      background: linear-gradient(to right, #0f172a, #1e293b) !important;
+      border-color: #334155 !important;
+    }
+    body.dark-mode .loc-bar .loc-label {
+      color: #94a3b8 !important;
+    }
+    body.dark-mode .loc-bar .loc-value {
+      color: #f1f5f9 !important;
+    }
+    body.dark-mode .loc-bar .loc-value:hover {
+      border-color: #475569 !important;
+      background: #0f172a !important;
+    }
+    
+    /* Destaque mais visível para os contatos principais no Modo Claro */
+    tr.bg-amber-50\/70 {
+      background-color: #fef3c7 !important;
+      border-left: 4px solid #f59e0b !important;
+    }
+
+    /* Contraste e legibilidade para todas as linhas no Modo Escuro */
+    body.dark-mode table tbody tr {
+      color: #f1f5f9 !important;
+    }
+    body.dark-mode table tbody tr td {
+      color: #f1f5f9 !important;
+    }
+
+    /* Destaque visível e com alto contraste para os contatos principais no Modo Escuro */
+    body.dark-mode tr.bg-amber-50\/70 {
+      background-color: rgba(217, 119, 6, 0.35) !important;
+      border-left: 4px solid #fbbf24 !important;
+      color: #ffffff !important;
+    }
+    body.dark-mode tr.bg-amber-50\/70 td {
+      color: #ffffff !important;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800 relative">
+
+  <!-- ============================================================
+       TELA DE BLOQUEIO DE ACESSO
+       ============================================================ -->
+  <div id="accessGateOverlay" class="fixed inset-0 z-[200] flex items-center justify-center p-4"
+       style="background: radial-gradient(1200px 600px at 0% -10%, rgba(251,191,36,0.18), transparent 60%), linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#334155 100%);">
+    <div id="accessGateCard" class="bg-white rounded-2xl shadow-card w-full max-w-md overflow-hidden">
+      <div class="bg-gradient-to-r from-brand-900 to-brand-700 text-white p-6 text-center">
+        <img src="Logo Blindagem.jpeg" alt="Blindagem"
+             class="w-16 h-16 object-contain rounded-xl border border-white/20 mx-auto mb-3 bg-white/5 p-1"
+             onerror="this.style.display='none'">
+        <h2 class="text-lg font-extrabold tracking-tight">Contatos Clientes Blindagem</h2>
+        <p class="text-xs text-brand-200 mt-1 uppercase tracking-widest">Acesso Restrito</p>
+      </div>
+      <form id="accessGateForm" class="p-6">
+  <p class="text-xs sm:text-sm text-gray-600 mb-4 text-center">
+    <i class="fas fa-shield-alt text-accent-500 mr-1"></i>
+    Digite a senha de acesso para visualizar os contatos.
+  </p>
+
+  <div class="relative mb-3">
+    <input type="password" id="accessPasswordInput" placeholder="Senha de acesso" required autocomplete="off"
+           class="w-full border border-gray-300 rounded-xl p-3 pr-12 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-400 focus:outline-none text-center tracking-widest">
+    <button type="button" onclick="togglePasswordVisibility('accessPasswordInput', this)"
+            aria-label="Mostrar senha"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800">
+      <i class="fas fa-eye"></i>
+    </button>
+  </div>
+
+  <p id="accessError" class="hidden text-xs text-red-600 mb-3 text-center font-semibold">
+    <i class="fas fa-exclamation-circle"></i> Senha incorreta. Tente novamente.
+  </p>
+
+  <button type="submit"
+          class="w-full py-3 bg-brand-900 hover:bg-brand-800 text-white rounded-xl text-sm font-bold shadow-card hover:shadow-card-hover transition flex items-center justify-center gap-2">
+    <i class="fas fa-unlock-alt"></i> Desbloquear Acesso
+  </button>
+
+  <p class="text-[10px] text-gray-400 text-center mt-4">
+    Sua senha é verificada localmente com criptografia PBKDF2-SHA256.
+  </p>
+</form>
+    </div>
+  </div>
+
+  <div id="appScreen" class="min-h-screen p-3 sm:p-6 max-w-7xl mx-auto read-only-mode" style="display:none;">
+    
+    <header class="bg-white/80 backdrop-blur rounded-2xl shadow-card border border-brand-200/70 p-4 sm:p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <img src="Logo Blindagem.jpeg" alt="Blindagem Segurança Eletrônica" class="w-12 h-12 object-contain rounded-lg border border-brand-200 shadow-soft" onerror="this.onerror=null; this.src='Logo Blindagem.jpeg';">
+        <div>
+          <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-brand-900 flex items-center gap-2">
+            Contatos Clientes Blindagem
+            <span class="hidden sm:inline-block h-1.5 w-1.5 rounded-full bg-accent-500"></span>
+            <span class="hidden sm:inline text-xs font-semibold text-brand-500 uppercase tracking-widest">Ronda - Tático</span>
+          </h1>
+          <div class="flex flex-wrap items-center gap-2 mt-1">
+            <span id="statusBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-100 text-brand-700 border border-brand-200">
+              <i class="fas fa-eye text-brand-500"></i> Modo Apenas Leitura
+            </span>
+            <span id="clientCountBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-accent-50 text-accent-700 border border-accent-200">
+              0 clientes
+            </span>
+            <span id="searchResultBadge" class="hidden inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-accent-50 text-accent-700 border border-accent-200">
+              Exibindo 0 clientes
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-1 border border-brand-200 rounded-xl p-0.5 bg-brand-50">
+  <button onclick="expandAllClients()" title="Expandir todos os blocos de clientes"
+          class="px-3 py-1.5 text-xs font-semibold text-brand-700 hover:bg-white hover:shadow-soft rounded-lg transition flex items-center gap-1.5">
+    <i class="fas fa-angle-double-down text-brand-500"></i>
+    <span class="hidden sm:inline">Expandir Todos</span>
+    <span class="sm:hidden">Expandir</span>
+  </button>
+  <button onclick="collapseAllClients()" title="Recolher todos os blocos de clientes"
+          class="px-3 py-1.5 text-xs font-semibold text-brand-700 hover:bg-white hover:shadow-soft rounded-lg transition flex items-center gap-1.5">
+    <i class="fas fa-angle-double-up text-brand-500"></i>
+    <span class="hidden sm:inline">Recolher Todos</span>
+    <span class="sm:hidden">Recolher</span>
+  </button>
+
+        <div id="editControls" class="hidden flex flex-wrap gap-2">
+          <button onclick="openPasteModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-3 py-2 rounded-xl text-xs sm:text-sm shadow-soft hover:shadow-card transition flex items-center gap-1.5">
+            <i class="fas fa-paste"></i> Colar Dados
+          </button>
+          <button onclick="addEmptyClient()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-3 py-2 rounded-xl text-xs sm:text-sm shadow-soft hover:shadow-card transition flex items-center gap-1.5">
+            <i class="fas fa-plus"></i> Novo Cliente
+          </button>
+          <button onclick="exportBackupJSON()" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-3 py-2 rounded-xl text-xs sm:text-sm shadow-soft hover:shadow-card transition flex items-center gap-1.5" title="Baixar arquivo de backup">
+            <i class="fas fa-file-download"></i> Exportar
+          </button>
+          <button onclick="triggerImportJSON()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-3 py-2 rounded-xl text-xs sm:text-sm shadow-soft hover:shadow-card transition flex items-center gap-1.5" title="Restaurar backup JSON">
+            <i class="fas fa-file-upload"></i> Importar
+          </button>
+          <input type="file" id="importJsonInput" accept=".json" class="hidden" onchange="importBackupJSON(event)">
+          <button onclick="lockEditMode()" class="bg-brand-800 hover:bg-brand-900 text-white font-semibold px-3 py-2 rounded-xl text-xs sm:text-sm shadow-soft hover:shadow-card transition flex items-center gap-1.5">
+            <i class="fas fa-lock"></i> Bloquear
+          </button>
+        </div>
+
+        <button id="btnUnlockEdit" onclick="promptUnlockEdit()" class="bg-brand-900 hover:bg-brand-800 text-white font-semibold px-4 py-2 rounded-xl text-xs sm:text-sm shadow-card hover:shadow-card-hover transition flex items-center gap-2">
+          <i class="fas fa-user-shield"></i> Edição
+        </button>
+		<button id="btnToggleDark" onclick="toggleDarkMode()" title="Alternar Modo Escuro/Claro" class="bg-brand-800 hover:bg-brand-700 text-amber-400 font-semibold px-3 py-2 rounded-xl text-xs sm:text-sm shadow-soft transition flex items-center gap-1.5">
+          <i id="darkModeIcon" class="fas fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <div class="mb-6">
+      <div class="relative">
+        <i class="fas fa-search absolute left-4 top-3.5 text-brand-400"></i>
+        <input type="text" id="searchInput" oninput="filterClients()" placeholder="Pesquisar por Código, Nome do Cliente, Contato, Telefone ou Endereço..." class="w-full pl-11 pr-10 py-3 bg-white border border-brand-200 rounded-2xl shadow-soft focus:ring-2 focus:ring-accent-400 focus:border-accent-300 focus:outline-none text-sm transition">
+        <button id="clearSearchBtn" onclick="clearSearch()" title="Limpar pesquisa" class="hidden absolute right-3 top-3 text-gray-400 hover:text-gray-600 p-1 transition">
+          <i class="fas fa-times-circle text-base"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="clientsContainer" class="space-y-6"></div>
+  </div>
+
+  <button id="btnScrollTop" onclick="scrollToTop()" class="hidden fixed bottom-6 right-6 bg-brand-900 hover:bg-brand-800 text-white p-3.5 rounded-full shadow-card hover:shadow-card-hover transition duration-200 z-40">
+    <i class="fas fa-arrow-up text-base"></i>
+  </button>
+
+  <div id="unlockModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-card w-full max-w-md overflow-hidden">
+      <div class="bg-gradient-to-r from-brand-900 to-brand-700 text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-base sm:text-lg flex items-center gap-2"><i class="fas fa-lock text-accent-400"></i> Liberar Modo Edição</h3>
+        <button onclick="closeUnlockModal()" class="text-brand-200 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <form onsubmit="verifyEditPassword(event)" class="p-6">
+  <p class="text-xs sm:text-sm text-gray-600 mb-4">
+    Digite a senha de administrador para liberar a edição, exclusão e inclusão de dados.
+  </p>
+
+  <div class="relative mb-4">
+    <input type="password" id="editPasswordInput" placeholder="Digite a senha" required
+           class="w-full border border-gray-300 rounded-xl p-2.5 pr-12 text-sm focus:ring-2 focus:ring-brand-500 focus:border-brand-400 focus:outline-none">
+    <button type="button" onclick="togglePasswordVisibility('editPasswordInput', this)"
+            aria-label="Mostrar senha"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800">
+      <i class="fas fa-eye"></i>
+    </button>
+  </div>
+
+  <div class="flex justify-end gap-2">
+    <button type="button" onclick="closeUnlockModal()"
+            class="px-4 py-2 border border-gray-300 rounded-xl text-xs sm:text-sm text-gray-700 hover:bg-gray-50">
+      Cancelar
+    </button>
+    <button type="submit"
+            class="px-4 py-2 bg-brand-900 hover:bg-brand-800 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-soft">
+      Confirmar
+    </button>
+  </div>
+</form>
+    </div>
+  </div>
+
+  <div id="securityModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-card w-full max-w-md overflow-hidden">
+      <div class="bg-gradient-to-r from-amber-600 to-accent-500 text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-base sm:text-lg flex items-center gap-2"><i class="fas fa-key"></i> Alterar Senha de Edição</h3>
+        <button onclick="closeSecurityModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <form onsubmit="changeAdminPassword(event)" class="p-6 space-y-4">
+  <div>
+    <label class="block text-xs font-semibold text-gray-600 mb-1">Senha Atual</label>
+    <div class="relative">
+      <input type="password" id="currentPassInput" required
+             class="w-full border border-gray-300 rounded-xl p-2.5 pr-12 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-400 focus:outline-none">
+      <button type="button" onclick="togglePasswordVisibility('currentPassInput', this)"
+              aria-label="Mostrar senha"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800">
+        <i class="fas fa-eye"></i>
+      </button>
+    </div>
+  </div>
+
+  <div>
+    <label class="block text-xs font-semibold text-gray-600 mb-1">Nova Senha</label>
+    <div class="relative">
+      <input type="password" id="newPassInput" required
+             class="w-full border border-gray-300 rounded-xl p-2.5 pr-12 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-400 focus:outline-none">
+      <button type="button" onclick="togglePasswordVisibility('newPassInput', this)"
+              aria-label="Mostrar senha"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800">
+        <i class="fas fa-eye"></i>
+      </button>
+    </div>
+  </div>
+
+  <div>
+    <label class="block text-xs font-semibold text-gray-600 mb-1">Confirmar Nova Senha</label>
+    <div class="relative">
+      <input type="password" id="confirmPassInput" required
+             class="w-full border border-gray-300 rounded-xl p-2.5 pr-12 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-400 focus:outline-none">
+      <button type="button" onclick="togglePasswordVisibility('confirmPassInput', this)"
+              aria-label="Mostrar senha"
+              class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-800">
+        <i class="fas fa-eye"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="flex justify-end gap-2 pt-2">
+    <button type="button" onclick="closeSecurityModal()"
+            class="px-4 py-2 border border-gray-300 rounded-xl text-xs sm:text-sm text-gray-700 hover:bg-gray-50">
+      Cancelar
+    </button>
+    <button type="submit"
+            class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-soft">
+      Salvar Nova Senha
+    </button>
+  </div>
+</form>
+    </div>
+  </div>
+
+  <div id="editContactModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-card w-full max-w-lg overflow-hidden">
+      <div class="bg-gradient-to-r from-blue-700 to-blue-500 text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-base sm:text-lg flex items-center gap-2"><i class="fas fa-edit"></i> Editar Contato</h3>
+        <button onclick="closeEditContactModal()" class="text-white hover:text-gray-200"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <form onsubmit="saveEditedContact(event)" class="p-6 space-y-4">
+        <input type="hidden" id="editClientIdx"><input type="hidden" id="editContactIdx">
+        <div><label class="block text-xs font-semibold text-gray-600 mb-1">Nome do Contato</label><input type="text" id="editContatoInput" required class="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-gray-600 mb-1">Número / Telefone</label><input type="text" id="editNumeroInput" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 focus:outline-none"></div>
+        <div><label class="block text-xs font-semibold text-gray-600 mb-1">Observações</label><textarea id="editObsInput" rows="3" class="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-400 focus:outline-none"></textarea></div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeEditContactModal()" class="px-4 py-2 border border-gray-300 rounded-xl text-xs sm:text-sm text-gray-700 hover:bg-gray-50">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-soft">Salvar Alterações</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="mapModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-card w-full max-w-3xl overflow-hidden flex flex-col">
+      <div class="bg-gradient-to-r from-brand-900 to-brand-700 text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-base sm:text-lg flex items-center gap-2" id="mapTitle"><i class="fas fa-map-marked-alt text-accent-400"></i> Localização do Cliente</h3>
+        <button onclick="closeMapModal()" class="text-brand-200 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <div class="p-4 bg-gray-50 flex-1">
+        <p id="mapAddressText" class="text-xs text-gray-600 mb-2 font-semibold"></p>
+        <iframe id="mapFrame" class="w-full h-80 sm:h-96 rounded-xl border border-brand-200 mb-4 shadow-inner" src="" loading="lazy"></iframe>
+        <div class="flex justify-end gap-2">
+          <button onclick="closeMapModal()" class="px-4 py-2 border border-gray-300 rounded-xl text-xs sm:text-sm text-gray-700 hover:bg-gray-100">Fechar</button>
+          <a id="googleMapsBtn" href="#" target="_blank" class="px-4 py-2 bg-brand-900 hover:bg-brand-800 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-soft flex items-center gap-2">
+            <i class="fas fa-external-link-alt"></i> Abrir Ponto no Google Maps
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="pasteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl shadow-card w-full max-w-3xl overflow-hidden">
+      <div class="bg-gradient-to-r from-brand-900 to-brand-700 text-white p-4 flex justify-between items-center">
+        <h3 class="font-bold text-base sm:text-lg flex items-center gap-2"><i class="fas fa-paste text-emerald-400"></i> Importar / Colar do Google Sheets</h3>
+        <button onclick="closePasteModal()" class="text-brand-200 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+      </div>
+      <div class="p-6">
+        <p class="text-xs sm:text-sm text-gray-600 mb-2">Selecione as linhas da sua planilha no Google Sheets, pressione <kbd class="bg-gray-100 border px-1.5 py-0.5 rounded">Ctrl+C</kbd> e cole (<kbd class="bg-gray-100 border px-1.5 py-0.5 rounded">Ctrl+V</kbd>) na caixa abaixo:</p>
+        <textarea id="pasteArea" rows="10" placeholder="Cole os dados copiados da planilha aqui..." class="w-full border border-gray-300 rounded-xl p-3 text-xs sm:text-sm font-mono focus:ring-2 focus:ring-emerald-500 focus:border-emerald-400 focus:outline-none"></textarea>
+        <div class="mt-4 flex justify-end gap-2">
+          <button onclick="closePasteModal()" class="px-4 py-2 border border-gray-300 rounded-xl text-xs sm:text-sm text-gray-700 hover:bg-gray-50">Cancelar</button>
+          <button onclick="processPastedData()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-soft">Processar e Adicionar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="clientes.js"></script>
+  <script>
+    let isEditMode = false;
+    
+
+			/* ============================================================
+		   AUTENTICAÇÃO:
+		   As senhas são validadas pelo Worker contatos-api.
+		   Os valores ficam nos Secrets da Cloudflare.
+		   ============================================================ */
+
+    const PBKDF2_ITERATIONS = 250000;
+
+    const ACCESS_STORAGE_KEY = 'blindagem_access_pbkdf2_v1';
+	const EDIT_STORAGE_KEY   = 'blindagem_edit_pbkdf2_v1';
+
+    let accessPasswordRecord = null;
+    let editPasswordRecord   = null;
+
+    const pbkdf2Cache = new Map();
+
+    function bufToHex(buf) { return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''); }
+    function hexToBuf(hex) {
+      const bytes = new Uint8Array(hex.length / 2);
+      for (let i = 0; i < bytes.length; i++) bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+      return bytes;
+    }
+    function randomSaltHex(bytes = 16) { const arr = new Uint8Array(bytes); crypto.getRandomValues(arr); return bufToHex(arr); }
+
+    async function deriveKey(password, saltHex, iterations) {
+      const cacheKey = password + '|' + saltHex + '|' + iterations;
+      if (pbkdf2Cache.has(cacheKey)) return pbkdf2Cache.get(cacheKey);
+      const enc = new TextEncoder();
+      const baseKey = await crypto.subtle.importKey('raw', enc.encode(password), { name: 'PBKDF2' }, false, ['deriveBits']);
+      const bits = await crypto.subtle.deriveBits(
+        { name: 'PBKDF2', salt: hexToBuf(saltHex), iterations: iterations, hash: 'SHA-256' },
+        baseKey, 256
+      );
+      const hex = bufToHex(bits);
+      pbkdf2Cache.set(cacheKey, hex);
+      return hex;
+    }
+
+    async function buildRecord(password) {
+      const salt = randomSaltHex(16);
+      const hash = await deriveKey(password, salt, PBKDF2_ITERATIONS);
+      return { salt, iterations: PBKDF2_ITERATIONS, hash };
+    }
+
+    async function ensureRecord(storageKey, defaultPassword) {
+      const stored = localStorage.getItem(storageKey);
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.salt && parsed.hash && parsed.iterations) return parsed;
+        } catch (e) {}
+      }
+      const record = await buildRecord(defaultPassword);
+      localStorage.setItem(storageKey, JSON.stringify(record));
+      return record;
+    }
+
+    async function verifyAgainst(record, entered) {
+      if (!entered || !record) return false;
+      const candidate = await deriveKey(entered, record.salt, record.iterations);
+      if (candidate.length !== record.hash.length) return false;
+      let diff = 0;
+      for (let i = 0; i < candidate.length; i++) diff |= candidate.charCodeAt(i) ^ record.hash.charCodeAt(i);
+      return diff === 0;
+    }
+
+    async function initSecurity() {
+  // A autenticação agora é feita pelo Worker.
+}
+editControls
+	let scrollSaveTimer;
+
+	function saveScrollPosition() {
+  const searchInput = document.getElementById('searchInput');
+  const expandedIndexes = Array.from(
+    document.querySelectorAll('.client-block.expanded-forced')
+  ).map(block => block.getAttribute('data-client-idx'));
+
+  const savedAt = String(Date.now());
+
+  localStorage.setItem('scroll_pos_v1', String(window.scrollY));
+  localStorage.setItem('scroll_saved_at_v1', savedAt);
+  localStorage.setItem('search_text_v1', searchInput ? searchInput.value : '');
+  localStorage.setItem('expanded_clients_v1', JSON.stringify(expandedIndexes));
+  localStorage.setItem('expanded_clients_saved_at_v1', savedAt);
+}
+
+	window.addEventListener('scroll', () => {
+	  clearTimeout(scrollSaveTimer);
+	  scrollSaveTimer = setTimeout(saveScrollPosition, 150);
+	}, { passive: true });
+
+	window.addEventListener('pagehide', saveScrollPosition);
+	document.addEventListener('visibilitychange', () => {
+	  if (document.visibilityState === 'hidden') saveScrollPosition();
+	});
+	const searchStateInput = document.getElementById('searchInput');
+if (searchStateInput) {
+  searchStateInput.addEventListener('input', saveScrollPosition);
+}
+	
+	function togglePasswordVisibility(inputId, button) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  const mostrar = input.type === 'password';
+  input.type = mostrar ? 'text' : 'password';
+
+  button.setAttribute(
+    'aria-label',
+    mostrar ? 'Ocultar senha' : 'Mostrar senha'
+  );
+
+  const icon = button.querySelector('i');
+  if (icon) {
+    icon.classList.toggle('fa-eye', !mostrar);
+    icon.classList.toggle('fa-eye-slash', mostrar);
+  }
+}
+
+	async function verifyAccessPassword(entered) {
+  try {
+    const response = await fetch(
+      'https://contatos-api.worklima.workers.dev/auth/access',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: entered })
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.ok || !result.token) {
+      return false;
+    }
+
+    sessionStorage.setItem('app_auth_token_v1', result.token);
+    sessionStorage.setItem(
+      'app_auth_expires_at_v1',
+      String(result.expiresAt)
+    );
+
+    return true;
+  } catch (error) {
+    console.error('Falha ao validar a senha de acesso no Worker:', error);
+    return false;
+  }
+}
+
+		async function verifyEditPasswordValue(entered) {
+	  try {
+		const response = await fetch(
+		  'https://contatos-api.worklima.workers.dev/auth/edit',
+		  {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ password: entered })
+		  }
+		);
+
+		const result = await response.json();
+
+		if (!response.ok || !result.ok || !result.token) {
+		  return false;
+		}
+
+		sessionStorage.setItem('admin_auth_token_v1', result.token);
+		sessionStorage.setItem(
+		  'admin_auth_expires_at_v1',
+		  String(result.expiresAt)
+		);
+
+		return true;
+	  } catch (error) {
+		console.error('Falha ao validar a senha de edição no Worker:', error);
+		return false;
+	  }
+	}
+
+    /* ============================================================
+       SESSÃO DE EDIÇÃO — expira após 1 hora de INATIVIDADE REAL
+       ============================================================ */
+    const SESSION_TIMEOUT_MS = 4 * 60 * 60 * 1000;
+    let sessionTimer = null;
+    let lastActivityTime = Date.now();
+
+    function startEditSession() {
+      lastActivityTime = Date.now();
+      resetSessionTimer();
+      attachActivityListeners();
+    }
+
+    function endEditSession() {
+      if (sessionTimer) { clearTimeout(sessionTimer); sessionTimer = null; }
+      detachActivityListeners();
+    }
+
+    function resetSessionTimer() {
+      if (sessionTimer) clearTimeout(sessionTimer);
+      sessionTimer = setTimeout(() => {
+        checkSessionTimeout();
+      }, SESSION_TIMEOUT_MS);
+    }
+
+    function checkSessionTimeout() {
+      const now = Date.now();
+      const elapsed = now - lastActivityTime;
+
+      if (elapsed >= SESSION_TIMEOUT_MS) {
+        if (isEditMode) {
+          isEditMode = false;
+          endEditSession();
+          updateUIEditState();
+          renderClients();
+          alert('Sessão de edição expirada por inatividade (1 hora). Ative a edição novamente se precisar.');
+        }
+      } else {
+        resetSessionTimer();
+      }
+    }
+
+    function registerActivity() {
+      lastActivityTime = Date.now();
+      if (isEditMode) resetSessionTimer();
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible' && isEditMode) {
+        checkSessionTimeout();
+      }
+    }
+
+    function attachActivityListeners() {
+      ['mousemove','mousedown','keydown','scroll','touchstart','click'].forEach(evt => {
+        window.addEventListener(evt, registerActivity, { passive: true });
+      });
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    function detachActivityListeners() {
+      ['mousemove','mousedown','keydown','scroll','touchstart','click'].forEach(evt => {
+        window.removeEventListener(evt, registerActivity);
+      });
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+
+    /* ============================================================
+       MAPA DE LINKS
+       ============================================================ */
+    const MAPA_LINKS = {
+      "0002": "",
+      "0003": "https://www.google.com/maps/search/?api=1&query=-14.6669117,-52.3493683",
+      "0004": "https://www.google.com/maps/search/?api=1&query=-14.65542,-52.3603617",
+      "0005": "https://www.google.com/maps/search/?api=1&query=-14.659025,-52.3551067",
+      "0006": "",
+      "0007": "https://www.google.com/maps/search/?api=1&query=-14.6646383,-52.3564617",
+      "0008": "https://www.google.com/maps/search/?api=1&query=-14.6757567,-52.3536433",
+      "0009": "https://maps.app.goo.gl/HQxr2EXgHpissuL89",
+      "0010": "https://www.google.com/maps/search/?api=1&query=-14.6834167,-52.349245",
+      "0011": "https://www.google.com/maps/search/?api=1&query=-14.6656433,-52.3663217",
+      "0012": "https://www.google.com/maps/search/?api=1&query=-14.67843,-52.3568183",
+      "0013": "https://www.google.com/maps/search/?api=1&query=-14.6623483,-52.3500067",
+      "0014": "https://www.google.com/maps/search/?api=1&query=-14.66383,-52.348395",
+      "0015": "https://www.google.com/maps/search/?api=1&query=-14.6695983,-52.3624267",
+      "0016": "https://www.google.com/maps/search/?api=1&query=-14.6747983,-52.3533517",
+      "0017": "https://www.google.com/maps/search/?api=1&query=-14.66389,-52.3469683",
+      "0018": "https://www.google.com/maps/search/?api=1&query=-14.67485,-52.353395",
+      "0019": "https://www.google.com/maps/search/?api=1&query=-14.676785,-52.3532517",
+      "0020": "https://www.google.com/maps/search/?api=1&query=-14.6668683,-52.35891",
+      "0021": "https://www.google.com/maps/search/?api=1&query=-14.6823283,-52.347055",
+      "0022": "https://www.google.com/maps/search/?api=1&query=-14.6676333,-52.35682",
+      "0023": "https://www.google.com/maps/search/?api=1&query=-14.6466733,-52.3567617",
+      "0024": "https://www.google.com/maps/search/?api=1&query=-14.6638317,-52.352325",
+      "0025": "https://www.google.com/maps/search/?api=1&query=-14.6657833,-52.351505",
+      "0026": "https://www.google.com/maps/search/?api=1&query=-14.6611,-52.354265",
+      "0027": "https://www.google.com/maps/search/?api=1&query=-14.6653217,-52.3482633",
+      "0028": "https://www.google.com/maps/search/?api=1&query=-14.66433,-52.35955",
+      "0029": "https://www.google.com/maps/search/?api=1&query=-14.6657033,-52.3627917",
+      "0030": "https://www.google.com/maps/search/?api=1&query=-14.6684283,-52.3598883",
+      "0031": "https://www.google.com/maps/search/?api=1&query=-14.6747467,-52.3582917",
+      "0032": "http://google.com/maps/search/?api=1&query=-14.6584717,-52.3578167",
+      "0034": "https://www.google.com/maps/search/?api=1&query=-14.670205,-52.350035",
+      "0035": "https://www.google.com/maps/search/?api=1&query=-14.6640267,-52.35298",
+      "0037": "https://www.google.com/maps/search/?api=1&query=-14.6639633,-52.34678",
+      "0038": "https://www.google.com/maps/search/?api=1&query=-14.6788417,-52.3568967",
+      "0039": "https://www.google.com/maps/search/?api=1&query=-14.6627983,-52.3555033",
+      "0040": "https://www.google.com/maps/search/?api=1&query=-14.6640583,-52.35499",
+      "0041": "",
+      "0042": "https://www.google.com/maps/search/?api=1&query=-14.6849133,-52.349735",
+      "0043": "https://www.google.com/maps/search/?api=1&query=-14.6850283,-52.34957",
+      "0044": "https://maps.app.goo.gl/pa4DaxdaJMNW9GT66",
+      "0045": "https://maps.app.goo.gl/gNJbrxeujPpuTB7v7",
+      "0046": "https://www.google.com/maps/search/?api=1&query=-14.6642133,-52.3529767",
+      "0047": "https://www.google.com/maps/search/?api=1&query=-14.6641183,-52.3558467",
+      "0048": "https://www.google.com/maps/search/?api=1&query=-14.6669067,-52.3500033",
+      "0049": "https://www.google.com/maps/search/?api=1&query=-14.663985,-52.3540933",
+      "0050": "https://www.google.com/maps/search/?api=1&query=-14.6659117,-52.36281",
+      "0051": "https://www.google.com/maps/search/?api=1&query=-14.6673467,-52.3424233",
+      "0052": "https://maps.app.goo.gl/K2TvJiW3Ytj7mUZ56",
+      "0053": "https://www.google.com/maps/search/?api=1&query=-14.6761467,-52.3531483",
+      "0054": "https://www.google.com/maps/search/?api=1&query=-14.6733883,-52.3511483",
+      "0055": "https://www.google.com/maps/search/?api=1&query=-14.6465983,-52.3570217",
+      "0056": "https://www.google.com/maps/search/?api=1&query=-14.6695617,-52.3623583",
+      "0057": "https://www.google.com/maps/search/?api=1&query=-14.6566717,-52.365145",
+      "0058": "https://maps.app.goo.gl/s1nmGQ5yAqXPTG2b7",
+      "0059": "https://www.google.com/maps/search/?api=1&query=-14.6787683,-52.34939",
+      "0060": "https://www.google.com/maps/search/?api=1&query=-14.6583783,-52.3553483",
+      "0061": "https://www.google.com/maps/search/?api=1&query=-14.6640117,-52.354435",
+      "0062": "https://www.google.com/maps/search/?api=1&query=-14.6609133,-52.3593033",
+      "0063": "https://www.google.com/maps/search/?api=1&query=-14.6643217,-52.35945",
+      "0064": "https://www.google.com/maps/search/?api=1&query=-14.663815,-52.3529883",
+      "0065": "https://www.google.com/maps/search/?api=1&query=-14.6682633,-52.3550367",
+      "0066": "https://www.google.com/maps/search/?api=1&query=-14.66714,-52.3579733",
+      "0067": "",
+      "0068": "https://www.google.com/maps/search/?api=1&query=-14.679955,-52.35799",
+      "0069": "https://maps.app.goo.gl/JBDudMhH1W7utogx8",
+      "0070": "https://www.google.com/maps/search/?api=1&query=-14.6660567,-52.3503517",
+      "0071": "http://google.com/maps/search/?api=1&query=-14.6654067,-52.3588133",
+      "0072": "",
+      "0073": "https://www.google.com/maps/search/?api=1&query=-14.67798,-52.348675",
+      "0074": "https://www.google.com/maps/search/?api=1&query=-14.6640883,-52.3554517",
+      "0075": "https://www.google.com/maps/search/?api=1&query=-14.6639033,-52.3564183",
+      "0076": "https://www.google.com/maps/search/?api=1&query=-14.6732117,-52.3550367",
+      "0077": "https://www.google.com/maps/search/?api=1&query=-14.6653067,-52.355965",
+      "0078": "https://www.google.com/maps/search/?api=1&query=-14.6557867,-52.3576333",
+      "0079": "https://maps.app.goo.gl/qVJwpuFQMThfS11X7",
+      "0080": "https://maps.app.goo.gl/b5JeZ4UP8fM4umus7",
+      "0081": "https://www.google.com/maps/search/?api=1&query=-14.65969,-52.3543667",
+      "0082": "https://www.google.com/maps/search/?api=1&query=-14.6665,-52.3540867",
+      "0083": "https://www.google.com/maps/search/?api=1&query=-14.647275,-52.3643967",
+      "0084": "https://www.google.com/maps/search/?api=1&query=-14.6649433,-52.3580367",
+      "0085": "https://www.google.com/maps/search/?api=1&query=-14.6608867,-52.3616633",
+      "0086": "https://www.google.com/maps/search/?api=1&query=-14.68123,-52.347915",
+      "0087": "https://www.google.com/maps/search/?api=1&query=-14.6508517,-52.3552",
+      "0088": "",
+      "0089": "https://www.google.com/maps/search/?api=1&query=-14.681845,-52.3563583",
+      "0090": "https://www.google.com/maps/search/?api=1&query=-14.6496367,-52.3551533",
+      "0091": "https://www.google.com/maps/search/?api=1&query=-14.668975,-52.3570367",
+      "0092": "https://www.google.com/maps/search/?api=1&query=-14.6577617,-52.353615",
+      "0093": "https://www.google.com/maps/search/?api=1&query=-14.6643,-52.3597333",
+      "0094": "https://www.google.com/maps/search/?api=1&query=-14.6625983,-52.347545",
+      "0095": "https://www.google.com/maps/search/?api=1&query=-14.6744817,-52.3580467",
+      "0096": "https://www.google.com/maps/search/?api=1&query=-14.663125,-52.3470517",
+      "0097": "https://www.google.com/maps/search/?api=1&query=-14.655165,-52.3597383",
+      "0099": "https://www.google.com/maps/search/?api=1&query=-14.6619317,-52.3564883",
+      "0100": "https://www.google.com/maps/search/?api=1&query=-14.6693317,-52.357425",
+      "0101": "https://maps.app.goo.gl/95RhozQvsfjaC5rUA",
+      "0103": "https://www.google.com/maps/search/?api=1&query=-14.6616383,-52.3562817",
+      "0104": "https://www.google.com/maps/search/?api=1&query=-14.6587233,-52.3778467",
+      "0105": "https://www.google.com/maps/search/?api=1&query=-14.6603717,-52.3562667",
+      "0106": "https://www.google.com/maps/search/?api=1&query=-14.66734,-52.3537217",
+      "0107": "https://maps.app.goo.gl/ScRGXdCnDYyRm8LC7",
+      "0108": "https://www.google.com/maps/search/?api=1&query=-14.6799333,-52.3512567",
+      "0109": "https://maps.app.goo.gl/ScRGXdCnDYyRm8LC7",
+      "0110": "https://www.google.com/maps/search/?api=1&query=-14.666985,-52.3579233",
+      "0111": "",
+      "0112": "https://www.google.com/maps/search/?api=1&query=-14.6764617,-52.35297",
+      "0113": "https://www.google.com/maps/search/?api=1&query=-14.6540433,-52.3550417",
+      "0114": "https://www.google.com/maps/search/?api=1&query=-14.6852333,-52.34928",
+      "0115": "https://www.google.com/maps/search/?api=1&query=-14.6698983,-52.3613433",
+      "0117": "https://maps.app.goo.gl/75oFkUyZPArb1Lvn8",
+      "0118": "",
+      "0119": "https://www.google.com/maps/search/?api=1&query=-14.664045,-52.3548333",
+      "0120": "https://maps.app.goo.gl/JyFcqeW4Xev2zjk59",
+      "0122": "https://www.google.com/maps/search/?api=1&query=-14.6610667,-52.3494533",
+      "0123": "https://www.google.com/maps/search/?api=1&query=-14.66276,-52.3546683",
+      "0124": "https://www.google.com/maps/search/?api=1&query=-14.6675167,-52.354645",
+      "0125": "https://www.google.com/maps/search/?api=1&query=-14.67953,-52.3561233",
+      "0126": "https://www.google.com/maps/search/?api=1&query=-14.6526217,-52.3549483",
+      "0127": "https://www.google.com/maps/search/?api=1&query=-14.6635356,-52.3580878",
+      "0128": "https://www.google.com/maps/search/?api=1&query=-14.6634717,-52.362565",
+      "0129": "https://www.google.com/maps/search/?api=1&query=-14.6633933,-52.35533",
+      "0130": "http://google.com/maps/search/?api=1&query=-14.651195,-52.3571917",
+      "0131": "https://maps.app.goo.gl/JDpbPL62wMUvEbjo9",
+      "0133": "https://maps.app.goo.gl/JDpbPL62wMUvEbjo9",
+      "0134": "https://www.google.com/maps/search/?api=1&query=-14.65877,-52.36007",
+      "0136": "https://www.google.com/maps/search/?api=1&query=-14.6643133,-52.35808",
+      "0137": "https://www.google.com/maps/search/?api=1&query=-14.666845,-52.35269",
+      "0138": "https://www.google.com/maps/search/?api=1&query=-14.6779083,-52.3574017",
+      "0139": "http://google.com/maps/search/?api=1&query=-14.6758517,-52.3523683",
+      "0140": "https://www.google.com/maps/search/?api=1&query=-14.6634867,-52.3562867",
+      "0141": "https://www.google.com/maps/search/?api=1&query=-14.66347,-52.3561667",
+      "0142": "https://www.google.com/maps/search/?api=1&query=-14.6794817,-52.35175",
+      "0143": "http://google.com/maps/search/?api=1&query=-14.662835,-52.3560233",
+      "0144": "https://www.google.com/maps/search/?api=1&query=-14.6633233,-52.3588367",
+      "0146": "https://www.google.com/maps/search/?api=1&query=-14.6633133,-52.3591583",
+      "0147": "http://google.com/maps/search/?api=1&query=-14.66109,-52.3616767",
+      "0148": "https://www.google.com/maps/search/?api=1&query=-14.666295,-52.36505",
+      "0149": "https://www.google.com/maps/search/?api=1&query=-14.6600833,-52.3584133",
+      "0151": "https://www.google.com/maps/search/?api=1&query=-14.67437,-52.357925",
+      "0155": "https://maps.app.goo.gl/r3HZwKN8mhRX8aV18"
+    };
+
+    function aplicarLinksMapa(lista) {
+      if (!Array.isArray(lista)) return lista;
+      lista.forEach(client => {
+        if (!client) return;
+        const cod = String(client.cod || '').padStart(4, '0');
+        if (client.linkMapa === undefined || client.linkMapa === null || client.linkMapa === '') {
+          if (MAPA_LINKS[cod] !== undefined) {
+            client.linkMapa = MAPA_LINKS[cod];
+          } else {
+            client.linkMapa = '';
+          }
+        }
+      });
+      return lista;
+    }
+
+    aplicarLinksMapa(DEFAULT_CLIENTS_DATA);
+
+    let clientsData;
+    try {
+      const stored = localStorage.getItem('clientsData_v7');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          clientsData = aplicarLinksMapa(parsed);
+        } else {
+          clientsData = DEFAULT_CLIENTS_DATA;
+        }
+      } else {
+        clientsData = DEFAULT_CLIENTS_DATA;
+      }
+    } catch (e) {
+      clientsData = DEFAULT_CLIENTS_DATA;
+    }
+
+    let dragSrcIndex = null;
+    let dragClientIndex = null;
+
+    window.onload = async function() {
+      await initSecurity();
+      initDarkMode();
+      
+      // Verifica se já passou pela senha nas últimas 6 horas
+      if (checkActiveAccessSession()) {
+        unlockAppScreen();
+      } else {
+        setTimeout(() => {
+          const input = document.getElementById('accessPasswordInput');
+          if (input) input.focus();
+        }, 100);
+      }
+    };
+
+    function initDarkMode() {
+      const isDark = localStorage.getItem('theme_dark_v1') === 'true';
+      if (isDark) {
+        document.body.classList.add('dark-mode');
+        updateDarkModeIcon(true);
+      }
+    }
+
+    function toggleDarkMode() {
+      const isDark = document.body.classList.toggle('dark-mode');
+      localStorage.setItem('theme_dark_v1', isDark);
+      updateDarkModeIcon(isDark);
+    }
+
+    function updateDarkModeIcon(isDark) {
+      const icon = document.getElementById('darkModeIcon');
+      if (!icon) return;
+      if (isDark) {
+        icon.className = 'fas fa-sun text-amber-300';
+      } else {
+        icon.className = 'fas fa-moon text-amber-400';
+      }
+    }
+
+    // CHAVE PARA SALVAR O CONTROLE DE 6 HORAS DE ACESSO
+    const ACCESS_SESSION_KEY = 'blindagem_access_timestamp_v1';
+    const SIX_HOURS_MS = 6 * 60 * 60 * 1000;
+
+    function checkActiveAccessSession() {
+      const savedTime = localStorage.getItem(ACCESS_SESSION_KEY);
+      if (!savedTime) return false;
+      const elapsed = Date.now() - parseInt(savedTime, 10);
+      return elapsed < SIX_HOURS_MS;
+    }
+
+    document.getElementById('accessGateForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const input = document.getElementById('accessPasswordInput');
+      const errorEl = document.getElementById('accessError');
+      const card = document.getElementById('accessGateCard');
+
+      const entered = input.value;
+      const ok = await verifyAccessPassword(entered);
+
+      if (ok) {
+        // Salva o momento do acesso bem-sucedido para valer por 6 horas
+        localStorage.setItem(ACCESS_SESSION_KEY, Date.now().toString());
+        unlockAppScreen();
+      } else {
+        errorEl.classList.remove('hidden');
+        card.classList.add('shake');
+        setTimeout(() => card.classList.remove('shake'), 600);
+        input.value = '';
+        input.focus();
+      }
+    });
+
+			function unlockAppScreen() {
+  const overlay = document.getElementById('accessGateOverlay');
+  overlay.style.transition = 'opacity .25s ease';
+  overlay.style.opacity = '0';
+
+  setTimeout(() => {
+    overlay.style.display = 'none';
+  }, 260);
+
+  const app = document.getElementById('appScreen');
+  app.style.display = 'block';
+  app.classList.add('read-only-mode');
+
+  sortAndRenderClients();
+  collapseAllClients();
+  updateUIEditState();
+
+  const savedAt = Number(localStorage.getItem('scroll_saved_at_v1'));
+  const estadoValido =
+    savedAt > 0 &&
+    Date.now() - savedAt <= 30 * 60 * 1000;
+
+  if (estadoValido) {
+    const searchInput = document.getElementById('searchInput');
+    const savedSearch = localStorage.getItem('search_text_v1');
+
+    if (searchInput && savedSearch !== null) {
+      searchInput.value = savedSearch;
+      filterClients();
+    }
+
+    const savedExpanded = localStorage.getItem('expanded_clients_v1');
+
+    if (savedExpanded) {
+      try {
+        const expandedIndexes = JSON.parse(savedExpanded);
+
+        expandedIndexes.forEach(index => {
+          const block = document.querySelector(
+            `.client-block[data-client-idx="${index}"]`
+          );
+
+          if (block) {
+            block.classList.remove('collapsed-forced');
+            block.classList.add('expanded-forced');
+          }
+        });
+      } catch (e) {
+        localStorage.removeItem('expanded_clients_v1');
+      }
+    }
+
+    const savedScroll = Number(localStorage.getItem('scroll_pos_v1')) || 0;
+
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.scrollTo({
+            top: savedScroll,
+            behavior: 'auto'
+          });
+        });
+      });
+    }, 100);
+  } else {
+    localStorage.removeItem('scroll_pos_v1');
+    localStorage.removeItem('scroll_saved_at_v1');
+    localStorage.removeItem('search_text_v1');
+    localStorage.removeItem('expanded_clients_v1');
+    localStorage.removeItem('expanded_clients_saved_at_v1');
+  }
+
+  window.onscroll = function() {
+    const btn = document.getElementById('btnScrollTop');
+
+    if (
+      document.body.scrollTop > 300 ||
+      document.documentElement.scrollTop > 300
+    ) {
+      btn.classList.remove('hidden');
+    } else {
+      btn.classList.add('hidden');
+    }
+  };
+}
+
+    function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+	function copyToClipboard(text) {
+	  if (!text) return;
+
+	  const mostrarSucesso = () => mostrarToastCopiado('Copiado');
+
+	  if (navigator.clipboard && window.isSecureContext) {
+		navigator.clipboard.writeText(text)
+		  .then(mostrarSucesso)
+		  .catch(() => copiarFallback(text));
+		return;
+	  }
+
+	  copiarFallback(text);
+	}
+
+    function copiarCodigoNome(clientIdx) {
+      const client = clientsData[clientIdx];
+      if (!client) return;
+      const cod = (client.cod || '').trim() || '0000';
+      const nome = (client.cliente || '').trim() || 'Cliente';
+      const texto = `${cod} - ${nome}`;
+
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(texto).then(() => {
+          mostrarToastCopiado('Copiado');
+        }).catch(() => copiarFallback(texto));
+      } else {
+        copiarFallback(texto);
+      }
+    }
+
+    function copiarFallback(texto) {
+      const ta = document.createElement('textarea');
+      ta.value = texto;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        mostrarToastCopiado('Copiado');
+      } catch (e) {
+        alert(`Não foi possível copiar. Texto: ${texto}`);
+      }
+      document.body.removeChild(ta);
+    }
+
+    function mostrarToastCopiado(msg) {
+      const anterior = document.getElementById('toastCopiado');
+      if (anterior) anterior.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'toastCopiado';
+      toast.style.cssText = `
+        position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+        background: #0f172a; color: #fff; padding: 12px 20px; border-radius: 12px;
+        font-size: 13px; font-weight: 600; z-index: 9999;
+        box-shadow: 0 10px 30px -10px rgba(15,23,42,0.4);
+        animation: fadeInToast 0.2s ease-out;
+        max-width: 90vw; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;
+      `;
+      toast.innerHTML = `<i class="fas fa-check-circle" style="color:#34d399;margin-right:6px;"></i>${msg}`;
+      document.body.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.transition = 'opacity 0.3s';
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 2200);
+    }
+
+    function expandAllClients() {
+      document.querySelectorAll('.client-block').forEach(b => {
+        b.classList.remove('collapsed-forced');
+        b.classList.add('expanded-forced');
+      });
+    }
+
+    function collapseAllClients() {
+      document.querySelectorAll('.client-block').forEach(b => {
+        b.classList.remove('expanded-forced');
+        b.classList.add('collapsed-forced');
+      });
+    }
+
+    function exportBackupJSON() {
+      if (!isEditMode) return;
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(clientsData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      const today = new Date().toISOString().split('T')[0];
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `backup_contatos_blindagem_${today}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function triggerImportJSON() {
+      if (!isEditMode) return;
+      document.getElementById('importJsonInput').click();
+    }
+
+    function importBackupJSON(event) {
+      if (!isEditMode) return;
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const parsedData = JSON.parse(e.target.result);
+          if (Array.isArray(parsedData)) {
+            if (confirm(`Deseja substituir a base atual por este backup contendo ${parsedData.length} clientes?`)) {
+              clientsData = aplicarLinksMapa(parsedData);
+              saveData();
+              sortAndRenderClients();
+              alert('Backup importado com sucesso!');
+            }
+          } else {
+            alert('Formato de arquivo JSON inválido.');
+          }
+        } catch (err) {
+          alert('Erro ao ler o arquivo JSON. Certifique-se de selecionar um backup válido.');
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+		function toggleClientExpand(blockElement) {
+	  if (blockElement.classList.contains('collapsed-forced')) {
+		blockElement.classList.remove('collapsed-forced');
+		blockElement.classList.add('expanded-forced');
+	  } else {
+		blockElement.classList.remove('expanded-forced');
+		blockElement.classList.add('collapsed-forced');
+	  }
+
+	  localStorage.setItem(
+		'expanded_clients_v1',
+		JSON.stringify(
+		  Array.from(document.querySelectorAll('.client-block.expanded-forced'))
+			.map(block => block.getAttribute('data-client-idx'))
+		)
+	  );
+	  localStorage.setItem('expanded_clients_saved_at_v1', String(Date.now()));
+	}
+
+    function promptUnlockEdit() {
+      document.getElementById('editPasswordInput').value = '';
+      document.getElementById('unlockModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('editPasswordInput').focus(), 50);
+    }
+
+    function closeUnlockModal() { document.getElementById('unlockModal').classList.add('hidden'); }
+
+    async function verifyEditPassword(e) {
+      e.preventDefault();
+      const enteredPass = document.getElementById('editPasswordInput').value;
+      const ok = await verifyEditPasswordValue(enteredPass);
+      if (ok) {
+        isEditMode = true;
+        closeUnlockModal();
+        updateUIEditState();
+        renderClients();
+        startEditSession();
+      } else {
+        alert('Senha incorreta!');
+      }
+    }
+
+    function lockEditMode() {
+      isEditMode = false;
+      endEditSession();
+      updateUIEditState();
+      renderClients();
+    }
+
+    function updateUIEditState() {
+      const app = document.getElementById('appScreen');
+      const editControls = document.getElementById('editControls');
+      const btnUnlock = document.getElementById('btnUnlockEdit');
+      const badge = document.getElementById('statusBadge');
+      if (isEditMode) {
+        app.classList.remove('read-only-mode');
+        editControls.classList.remove('hidden');
+        btnUnlock.classList.add('hidden');
+        badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-800 border border-emerald-200";
+        badge.innerHTML = '<i class="fas fa-edit text-emerald-600"></i> Modo Edição Ativo';
+      } else {
+        app.classList.add('read-only-mode');
+        editControls.classList.add('hidden');
+        btnUnlock.classList.remove('hidden');
+        badge.className = "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-100 text-brand-700 border border-brand-200";
+        badge.innerHTML = '<i class="fas fa-eye text-brand-500"></i> Modo Apenas Leitura';
+      }
+    }
+
+    function openSecurityModal() {
+      document.getElementById('currentPassInput').value = '';
+      document.getElementById('newPassInput').value = '';
+      document.getElementById('confirmPassInput').value = '';
+      document.getElementById('securityModal').classList.remove('hidden');
+    }
+
+    function closeSecurityModal() { document.getElementById('securityModal').classList.add('hidden'); }
+
+    async function changeAdminPassword(e) {
+      e.preventDefault();
+      const current = document.getElementById('currentPassInput').value;
+      const newPass = document.getElementById('newPassInput').value;
+      const confirmPass = document.getElementById('confirmPassInput').value;
+      if (!(await verifyEditPasswordValue(current))) { alert('A senha atual está incorreta.'); return; }
+      if (newPass !== confirmPass) { alert('A nova senha e a confirmação não coincidem.'); return; }
+      if (!newPass.trim() || newPass.length < 6) { alert('A nova senha deve ter pelo menos 6 caracteres.'); return; }
+      await setNewEditPassword(newPass.trim());
+      alert('Senha de edição alterada com sucesso!');
+      closeSecurityModal();
+    }
+
+    function sortAndRenderClients() {
+      clientsData.sort((a, b) => {
+        const numA = parseInt(a.cod, 10) || 0;
+        const numB = parseInt(b.cod, 10) || 0;
+        return numA - numB;
+      });
+      renderClients();
+    }
+
+    function formatPhoneForWa(phone) {
+      if (!phone) return '';
+      const clean = phone.replace(/\D/g, '');
+      if (clean.length === 10 || clean.length === 11) return '55' + clean;
+      return clean;
+    }
+
+    function renderClients() {
+      const container = document.getElementById('clientsContainer');
+      container.innerHTML = '';
+      document.getElementById('clientCountBadge').innerText = `${clientsData.length} cliente${clientsData.length === 1 ? '' : 's'}`;
+
+      if (clientsData.length === 0) {
+        container.innerHTML = `
+          <div class="bg-white rounded-2xl p-12 text-center text-gray-500 border border-brand-200 shadow-soft">
+            <i class="fas fa-folder-open fa-3x mb-3 text-brand-300"></i>
+            <p class="text-lg font-medium">Nenhum cliente cadastrado.</p>
+          </div>
+        `;
+        return;
+      }
+
+      clientsData.forEach((client, clientIdx) => {
+        const clientBlock = document.createElement('div');
+        clientBlock.className = 'client-block bg-white rounded-2xl shadow-card border border-brand-200/70 overflow-hidden';
+        clientBlock.setAttribute('data-client-idx', clientIdx);
+
+        // ORDENAÇÃO AUTOMÁTICA: Os dois primeiros contatos originais ficam sempre no topo e destacados
+        let orderedContacts = client.contacts.map((c, originalIdx) => ({ 
+          ...c, 
+          _originalIdx: originalIdx,
+          _isTopTwo: originalIdx === 0 || originalIdx === 1 
+        })).sort((a, b) => {
+          const pa = (a.prioritario || a._isTopTwo) ? 1 : 0;
+          const pb = (b.prioritario || b._isTopTwo) ? 1 : 0;
+          if (pa !== pb) return pb - pa;
+          return a._originalIdx - b._originalIdx;
+        });
+
+        let contactsRows = orderedContacts.map((c) => {
+          const contactIdx = c._originalIdx;
+          const waNum = formatPhoneForWa(c.numero);
+          const rawNum = c.numero ? c.numero.replace(/\D/g, '') : '';
+
+          const phoneActions = c.numero ? `
+            <div class="flex items-center gap-1.5 mt-1">
+              <a href="tel:${rawNum}" title="Ligar para o número" class="text-xs text-brand-700 hover:text-brand-900 bg-brand-100 hover:bg-brand-200 px-2 py-0.5 rounded font-semibold transition">
+                <i class="fas fa-phone-alt"></i> Ligar
+              </a>
+              <button onclick="copyToClipboard('${c.numero}')" title="Copiar número" class="text-xs text-brand-600 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-2 py-0.5 rounded font-semibold transition">
+                <i class="fas fa-copy"></i> Copiar
+              </button>
+            </div>
+          ` : '';
+
+          const waBtn = waNum
+            ? `<a href="https://wa.me/${waNum}" target="_blank" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 font-semibold transition text-xs">
+                 <i class="fab fa-whatsapp text-emerald-600"></i> Abrir WhatsApp
+               </a>`
+            : `<span class="text-gray-400 text-xs">Sem número</span>`;
+
+          const dragAttr = isEditMode ? 'draggable="true"' : '';
+          const dragEvents = isEditMode ? `ondragstart="handleDragStart(event, ${clientIdx}, ${contactIdx})" ondragover="handleDragOver(event)" ondrop="handleDrop(event, ${clientIdx}, ${contactIdx})" ondragend="handleDragEnd(event)"` : '';
+          const cursorStyle = isEditMode ? 'cursor-move' : '';
+
+          const starClass = c.prioritario ? 'text-amber-500 hover:text-amber-600' : 'text-gray-400 hover:text-amber-500';
+          const starIcon = c.prioritario ? 'fas fa-star' : 'far fa-star';
+          const starTitle = c.prioritario ? 'Remover prioridade' : 'Marcar como prioritário';
+
+          const actionButtons = isEditMode ? `
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="togglePriority(${clientIdx}, ${contactIdx})" title="${starTitle}" class="${starClass} p-1 rounded transition"><i class="${starIcon}"></i></button>
+              <button onclick="openEditContactModal(${clientIdx}, ${contactIdx})" title="Editar Contato" class="text-blue-600 hover:text-blue-800 p-1 rounded transition"><i class="fas fa-edit"></i></button>
+              <button onclick="deleteContact(${clientIdx}, ${contactIdx})" title="Excluir Contato" class="text-red-500 hover:text-red-700 p-1 rounded transition"><i class="fas fa-trash-alt"></i></button>
+            </div>
+          ` : (c._isTopTwo
+            ? `<span class="inline-flex items-center gap-1 text-amber-600 text-xs font-semibold"><i class="fas fa-star"></i> Principal</span>`
+            : `<span class="text-gray-300 text-xs">-</span>`);
+
+          const rowPriorityClass = c._isTopTwo ? 'bg-amber-50/70 border-l-4 border-l-amber-400 font-medium' : '';
+
+          return `
+            <tr ${dragAttr} ${dragEvents} class="hover:bg-accent-50/50 transition border-b border-brand-100 last:border-0 ${cursorStyle} ${rowPriorityClass}">
+              <td class="p-3 text-brand-400 text-center w-8">${isEditMode ? '<i class="fas fa-grip-vertical"></i>' : ''}</td>
+              <td class="p-3 text-sm font-medium text-brand-900" contenteditable="${isEditMode}" onblur="updateContact(${clientIdx}, ${contactIdx}, 'contato', this.innerText)">${c.contato || ''}</td>
+              <td class="p-3 text-sm text-brand-700">
+                <span contenteditable="${isEditMode}" onblur="updateContact(${clientIdx}, ${contactIdx}, 'numero', this.innerText)" class="px-1 py-0.5 rounded">${c.numero || ''}</span>
+                ${phoneActions}
+              </td>
+              <td class="p-3 text-sm">${waBtn}</td>
+              <td class="p-3 text-sm text-brand-500" contenteditable="${isEditMode}" onblur="updateContact(${clientIdx}, ${contactIdx}, 'observacoes', this.innerText)">${c.observacoes || ''}</td>
+              <td class="p-3 text-sm text-center">${actionButtons}</td>
+            </tr>
+          `;
+        }).join('');
+
+        const temLink = client.linkMapa && client.linkMapa.trim() !== '';
+        const temEndereco = client.endereco && client.endereco.trim() !== '';
+        const hasGeo = temLink || temEndereco;
+
+        const geoBtnHeader = hasGeo
+          ? `<button onclick="event.stopPropagation(); openMapModal(${clientIdx})" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 font-semibold transition text-xs shrink-0">
+               <i class="fas fa-map-marker-alt text-red-500"></i> Ponto Exato
+             </button>`
+          : `<span class="text-gray-400 text-xs">Sem localização</span>`;
+
+        const clientHeaderActions = isEditMode ? `
+          <div class="flex items-center gap-2">
+            <button onclick="event.stopPropagation(); addContactToClient(${clientIdx})" class="bg-brand-700 hover:bg-brand-600 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1">
+              <i class="fas fa-plus"></i> Add Contato
+            </button>
+            <button onclick="event.stopPropagation(); deleteClient(${clientIdx})" title="Excluir Cliente Inteiro" class="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1.5 rounded-lg font-semibold transition flex items-center gap-1">
+              <i class="fas fa-trash"></i> Excluir Bloco
+            </button>
+          </div>
+        ` : '';
+
+        clientBlock.innerHTML = `
+          <div onclick="toggleClientExpand(this.parentElement)" class="text-white p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer select-none relative z-10">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+              <span class="bg-accent-500 text-brand-900 text-xs font-bold px-3 py-1.5 rounded-lg shadow-soft shrink-0" contenteditable="${isEditMode}" onblur="updateClientInfo(${clientIdx}, 'cod', this.innerText)">${client.cod || '0000'}</span>
+              <h3 class="text-lg font-bold tracking-tight px-2 py-0.5 rounded truncate" contenteditable="${isEditMode}" onblur="updateClientInfo(${clientIdx}, 'cliente', this.innerText)">${client.cliente || 'Nome do Cliente'}</h3>
+              <button onclick="event.stopPropagation(); copiarCodigoNome(${clientIdx})" title="Copiar código e nome do cliente" class="text-white/70 hover:text-white bg-white/10 hover:bg-white/20 p-1.5 rounded-lg transition shrink-0" style="position:relative; z-index:20;">
+                <i class="fas fa-copy text-xs"></i>
+              </button>
+            </div>
+            ${clientHeaderActions}
+          </div>
+
+          <div class="client-details">
+            <div class="loc-bar">
+              <div class="loc-icon map"><i class="fas fa-map-marker-alt"></i></div>
+              <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                <span class="loc-label" style="flex-shrink:0;">Endereço</span>
+                <span class="loc-value ${!client.endereco ? 'empty' : ''}" contenteditable="${isEditMode}" onblur="updateClientInfo(${clientIdx}, 'endereco', this.innerText)" style="flex:1;">${client.endereco || '— sem endereço —'}</span>
+              </div>
+              <div></div>
+
+              <div class="loc-icon link"><i class="fas fa-link"></i></div>
+              <div style="display:flex; align-items:center; gap:8px; min-width:0;">
+                <span class="loc-label" style="flex-shrink:0;">Link Mapa</span>
+                <span class="loc-value ${!client.linkMapa ? 'empty' : ''}" contenteditable="${isEditMode}" onblur="updateClientInfo(${clientIdx}, 'linkMapa', this.innerText)" style="flex:1;">${client.linkMapa || '— sem link cadastrado —'}</span>
+              </div>
+              <div>${geoBtnHeader}</div>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse min-w-full">
+                <thead>
+                  <tr class="text-brand-600 text-xs font-semibold uppercase tracking-wider border-b border-brand-200">
+                    <th class="p-3 w-8"></th>
+                    <th class="p-3">Contato</th>
+                    <th class="p-3">Número</th>
+                    <th class="p-3">WhatsApp</th>
+                    <th class="p-3">Observações</th>
+                    <th class="p-3 text-center w-24">Ações</th>
+                  </tr>
+                </thead>
+                <tbody>${contactsRows}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+
+        container.appendChild(clientBlock);
+      });
+    }
+
+    function handleDragStart(e, clientIdx, contactIdx) {
+      if (!isEditMode) return;
+      dragClientIndex = clientIdx;
+      dragSrcIndex = contactIdx;
+      e.currentTarget.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e) {
+      if (!isEditMode) return;
+      if (e.preventDefault) e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      return false;
+    }
+
+    function handleDrop(e, clientIdx, targetIdx) {
+      if (!isEditMode) return;
+      e.stopPropagation();
+      if (dragClientIndex === clientIdx && dragSrcIndex !== targetIdx) {
+        const list = clientsData[clientIdx].contacts;
+        const [movedItem] = list.splice(dragSrcIndex, 1);
+        list.splice(targetIdx, 0, movedItem);
+        saveData();
+        renderClients();
+      }
+      return false;
+    }
+
+    function handleDragEnd(e) { e.currentTarget.classList.remove('dragging'); }
+
+    function openEditContactModal(clientIdx, contactIdx) {
+      const contact = clientsData[clientIdx].contacts[contactIdx];
+      document.getElementById('editClientIdx').value = clientIdx;
+      document.getElementById('editContactIdx').value = contactIdx;
+      document.getElementById('editContatoInput').value = contact.contato || '';
+      document.getElementById('editNumeroInput').value = contact.numero || '';
+      document.getElementById('editObsInput').value = contact.observacoes || '';
+      document.getElementById('editContactModal').classList.remove('hidden');
+    }
+
+    function closeEditContactModal() { document.getElementById('editContactModal').classList.add('hidden'); }
+
+    function saveEditedContact(e) {
+      e.preventDefault();
+      const clientIdx = document.getElementById('editClientIdx').value;
+      const contactIdx = document.getElementById('editContactIdx').value;
+      const _prev = clientsData[clientIdx].contacts[contactIdx] || {};
+      clientsData[clientIdx].contacts[contactIdx] = {
+        contato: document.getElementById('editContatoInput').value.trim(),
+        numero: document.getElementById('editNumeroInput').value.trim(),
+        whatsapp: 'Abrir WhatsApp',
+        observacoes: document.getElementById('editObsInput').value.trim(),
+        prioritario: _prev.prioritario === true
+      };
+      saveData();
+      renderClients();
+      closeEditContactModal();
+    }
+
+    function updateClientInfo(clientIdx, field, value) {
+      if (!isEditMode) return;
+      clientsData[clientIdx][field] = value.trim();
+      saveData();
+      if (field === 'cod') {
+        sortAndRenderClients();
+      } else if (field === 'endereco' || field === 'linkMapa') {
+        renderClients();
+      }
+    }
+
+    function updateContact(clientIdx, contactIdx, field, value) {
+      if (!isEditMode) return;
+      clientsData[clientIdx].contacts[contactIdx][field] = value.trim();
+      saveData();
+      if (field === 'numero') renderClients();
+    }
+
+    function deleteClient(clientIdx) {
+      if (!isEditMode) return;
+      if (confirm('Tem certeza que deseja excluir este cliente e seus contatos?')) {
+        clientsData.splice(clientIdx, 1);
+        saveData();
+        renderClients();
+      }
+    }
+
+    function deleteContact(clientIdx, contactIdx) {
+      if (!isEditMode) return;
+      clientsData[clientIdx].contacts.splice(contactIdx, 1);
+      saveData();
+      renderClients();
+    }
+
+    function togglePriority(clientIdx, contactIdx) {
+      if (!isEditMode) return;
+      const contact = clientsData[clientIdx].contacts[contactIdx];
+      contact.prioritario = !contact.prioritario;
+      
+      // Reordena imediatamente os contatos deste cliente para o prioritário subir para o topo
+      clientsData[clientIdx].contacts.sort((a, b) => {
+        const pa = a.prioritario ? 1 : 0;
+        const pb = b.prioritario ? 1 : 0;
+        if (pa !== pb) return pb - pa;
+        return 0;
+      });
+
+      saveData();
+      renderClients();
+    }
+
+    function addContactToClient(clientIdx) {
+      if (!isEditMode) return;
+      clientsData[clientIdx].contacts.push({
+        contato: 'Novo Contato', numero: '', whatsapp: 'Abrir WhatsApp', observacoes: '', prioritario: false
+      });
+      saveData();
+      renderClients();
+    }
+
+    function addEmptyClient() {
+      if (!isEditMode) return;
+      clientsData.push({
+        cod: '0000',
+        cliente: 'Novo Cliente',
+        endereco: '',
+        linkMapa: '',
+        contacts: [
+          { contato: 'Contato Principal', numero: '', whatsapp: 'Abrir WhatsApp', observacoes: '', prioritario: false }
+        ]
+      });
+      saveData();
+      sortAndRenderClients();
+    }
+
+    function saveData() {
+      localStorage.setItem('clientsData_v7', JSON.stringify(clientsData));
+    }
+
+    function openMapModal(clientIdx) {
+      const client = clientsData[clientIdx];
+      if (!client) return;
+
+      const linkMapa = (client.linkMapa || '').trim();
+      const endereco = (client.endereco || '').trim();
+      const title = client.cliente || 'Localização do Cliente';
+
+      document.getElementById('mapTitle').innerText = title;
+
+      const iframe = document.getElementById('mapFrame');
+      const googleBtn = document.getElementById('googleMapsBtn');
+      const addressText = document.getElementById('mapAddressText');
+
+      iframe.removeAttribute('srcdoc');
+      iframe.src = '';
+
+      if (linkMapa) {
+        googleBtn.href = linkMapa;
+
+        let coords = null;
+        let m = linkMapa.match(/[?&]query=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+        if (m) coords = { lat: m[1], lng: m[2] };
+        if (!coords) {
+          m = linkMapa.match(/@(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+          if (m) coords = { lat: m[1], lng: m[2] };
+        }
+        if (!coords) {
+          m = linkMapa.match(/[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/);
+          if (m) coords = { lat: m[1], lng: m[2] };
+        }
+
+        if (coords) {
+          iframe.src = `https://maps.google.com/maps?q=${coords.lat},${coords.lng}&t=&z=16&ie=UTF8&iwloc=B&output=embed`;
+          addressText.innerText = `Coordenadas: ${coords.lat}, ${coords.lng}`;
+        } else {
+          iframe.srcdoc = `
+            <!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+              body { font-family:'Inter',sans-serif; display:flex; align-items:center; justify-content:center;
+                     height:100%; margin:0; background:#f8fafc; color:#334155; text-align:center; padding:20px; box-sizing:border-box; }
+              .box { max-width:420px; }
+              .icon { font-size:52px; margin-bottom:16px; }
+              h3 { margin:0 0 8px; color:#0f172a; font-size:18px; }
+              p { margin:0; font-size:14px; color:#64748b; line-height:1.55; }
+              strong { color:#0f172a; }
+            </style></head><body><div class="box">
+              <div class="icon">📍</div>
+              <h3>Link de localização cadastrado</h3>
+              <p>Este cliente possui um link personalizado do Google Maps.<br>
+              Clique no botão <strong>"Abrir Ponto no Google Maps"</strong> abaixo para ver a localização exata.</p>
+            </div></body></html>
+          `;
+          addressText.innerText = `Link: ${linkMapa}`;
+        }
+      }
+      else if (endereco) {
+        const enderecoCompleto = `${endereco}, Nova Xavantina, MT, Brasil`;
+        const query = encodeURIComponent(enderecoCompleto);
+        iframe.src = `https://maps.google.com/maps?q=${query}&t=&z=16&ie=UTF8&iwloc=B&output=embed`;
+        googleBtn.href = `https://www.google.com/maps/search/?api=1&query=${query}`;
+        addressText.innerText = `Endereço: ${endereco} (Nova Xavantina - MT)`;
+      }
+      else {
+        iframe.srcdoc = `
+          <!DOCTYPE html><html><head><meta charset="UTF-8"><style>
+            body { font-family:'Inter',sans-serif; display:flex; align-items:center; justify-content:center;
+                   height:100%; margin:0; background:#f8fafc; color:#94a3b8; text-align:center; padding:20px; box-sizing:border-box; }
+          </style></head><body><div>
+            <div style="font-size:52px;">🗺️</div>
+            <h3 style="color:#0f172a; margin:8px 0;">Sem localização cadastrada</h3>
+            <p style="font-size:14px; margin:0;">Ative o modo edição e adicione um link de mapa ou endereço.</p>
+          </div></body></html>
+        `;
+        googleBtn.href = '#';
+        addressText.innerText = '';
+      }
+
+      document.getElementById('mapModal').classList.remove('hidden');
+    }
+
+    function closeMapModal() {
+      document.getElementById('mapModal').classList.add('hidden');
+      const iframe = document.getElementById('mapFrame');
+      iframe.src = '';
+      iframe.removeAttribute('srcdoc');
+    }
+
+    function openPasteModal() {
+      if (!isEditMode) return;
+      document.getElementById('pasteArea').value = '';
+      document.getElementById('pasteModal').classList.remove('hidden');
+    }
+
+    function closePasteModal() { document.getElementById('pasteModal').classList.add('hidden'); }
+
+    function processPastedData() {
+      if (!isEditMode) return;
+      const rawText = document.getElementById('pasteArea').value;
+      if (!rawText.trim()) { alert('Por favor, cole os dados antes de processar.'); return; }
+
+      const lines = rawText.split('\n');
+      let currentClient = null;
+
+      lines.forEach(line => {
+        if (!line.trim()) return;
+        let cols = line.split('\t');
+        if (cols.length === 1) cols = line.split(/\s{2,}/);
+
+        const cod = cols[0] ? cols[0].trim() : '';
+        const cliente = cols[1] ? cols[1].trim() : '';
+        const endereco = cols[2] ? cols[2].trim() : '';
+        const contato = cols[3] ? cols[3].trim() : '';
+        const numero = cols[4] ? cols[4].trim() : '';
+        const whatsapp = cols[5] ? cols[5].trim() : 'Abrir WhatsApp';
+        const observacoes = cols[7] ? cols[7].trim() : (cols[6] && !cols[6].includes('Ver Localização') ? cols[6].trim() : '');
+
+        if (cod || cliente) {
+          let existing = clientsData.find(c => c.cod === cod && cod !== '');
+          if (!existing) {
+            currentClient = {
+              cod: cod || '0000',
+              cliente: cliente || 'Cliente',
+              endereco: endereco || '',
+              linkMapa: MAPA_LINKS[cod] || '',
+              contacts: []
+            };
+            clientsData.push(currentClient);
+          } else {
+            currentClient = existing;
+            if (cliente) currentClient.cliente = cliente;
+            if (endereco) currentClient.endereco = endereco;
+          }
+        }
+
+        if (currentClient && (contato || numero)) {
+          currentClient.contacts.push({
+            contato: contato || 'Contato',
+            numero: numero || '',
+            whatsapp: whatsapp || 'Abrir WhatsApp',
+            observacoes: observacoes || '',
+            prioritario: false
+          });
+        }
+      });
+
+      saveData();
+      sortAndRenderClients();
+        collapseAllClients();
+    }
+
+    function filterClients() {
+      const input = document.getElementById('searchInput');
+      const term = input.value.toLowerCase().trim();
+      const blocks = document.querySelectorAll('#clientsContainer > div[data-client-idx]');
+      const searchBadge = document.getElementById('searchResultBadge');
+      const clearBtn = document.getElementById('clearSearchBtn');
+
+      if (clearBtn) {
+        if (input.value.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+      }
+
+      if (!term) {
+        blocks.forEach(block => block.classList.remove('hidden'));
+        searchBadge.classList.add('hidden');
+        return;
+      }
+
+      let visibleCount = 0;
+      blocks.forEach(block => {
+        const text = block.innerText.toLowerCase();
+        const matches = text.includes(term);
+        block.classList.toggle('hidden', !matches);
+        if (matches) visibleCount++;
+      });
+
+      searchBadge.innerText = `Exibindo ${visibleCount} de ${clientsData.length} clientes`;
+      searchBadge.classList.remove('hidden');
+    }
+
+    function clearSearch() {
+      const input = document.getElementById('searchInput');
+      input.value = '';
+      filterClients();
+      input.focus();
+    }
+  </script>
+  
+    <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then((reg) => console.log('SW registrado:', reg.scope))
+          .catch((err) => console.warn('Falha ao registrar SW:', err));
+      });
+    }
+  </script>
+</body>
+</html>
