@@ -24,12 +24,6 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Configurar Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
       - name: Cache do Gradle
         uses: actions/cache@v4
         with:
@@ -51,6 +45,7 @@ jobs:
           npx cap init "Contatos Blindagem" "com.vonildoj.blindagem" --web-dir www
           npx cap add android
           npx cap sync
+          sed -i 's|https://services.gradle.org/distributions/gradle-8.11.1-all.zip|https://github.com/gradle/gradle-distributions/releases/download/v8.11.1/gradle-8.11.1-all.zip|g' android/gradle/wrapper/gradle-wrapper.properties
 
       - name: Gerar Ícone do App Android
         run: |
