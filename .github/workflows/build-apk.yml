@@ -24,15 +24,10 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Cache do Gradle
-        uses: actions/cache@v4
+      - name: Instalar Gradle
+        uses: gradle/actions/setup-gradle@v3
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          gradle-version: '8.11.1'
 
       - name: Instalar dependências
         run: npm install
@@ -45,7 +40,6 @@ jobs:
           npx cap init "Contatos Blindagem" "com.vonildoj.blindagem" --web-dir www
           npx cap add android
           npx cap sync
-          sed -i 's|https://services.gradle.org/distributions/gradle-8.11.1-all.zip|https://github.com/gradle/gradle-distributions/releases/download/v8.11.1/gradle-8.11.1-all.zip|g' android/gradle/wrapper/gradle-wrapper.properties
 
       - name: Gerar Ícone do App Android
         run: |
