@@ -36,6 +36,14 @@ jobs:
           npx cap add android
           npx cap sync
 
+      - name: Gerar Ícone do App Android
+        run: |
+          npx @capacitor/assets generate --android \
+            --iconBackgroundColor '#0f172a' \
+            --iconBackgroundColorDark '#0f172a' \
+            --splashBackgroundColor '#0f172a' \
+            --splashBackgroundColorDark '#0f172a'
+
       - name: Compilar APK (Debug)
         run: |
           cd android
