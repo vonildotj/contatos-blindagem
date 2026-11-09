@@ -24,10 +24,11 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Instalar Gradle
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: '8.11.1'
+      - name: Instalar Gradle via SDKMAN
+        run: |
+          curl -s "https://get.sdkman.io" | bash
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk install gradle 8.11.1
 
       - name: Instalar dependências
         run: npm install
