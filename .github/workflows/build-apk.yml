@@ -24,11 +24,12 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Instalar Gradle via SDKMAN
+      - name: Instalar Gradle via Download Direto
         run: |
-          curl -s "https://get.sdkman.io" | bash
-          source "$HOME/.sdkman/bin/sdkman-init.sh"
-          sdk install gradle 8.11.1
+          cd /tmp
+          wget -q https://github.com/gradle/gradle-distributions/releases/download/v8.11.1/gradle-8.11.1-bin.zip
+          unzip -q gradle-8.11.1-bin.zip
+          echo "/tmp/gradle-8.11.1/bin" >> $GITHUB_PATH
 
       - name: Instalar dependências
         run: npm install
