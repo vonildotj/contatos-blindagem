@@ -34,6 +34,9 @@ jobs:
       - name: Instalar dependências
         run: npm install
 
+      - name: Instalar ferramenta de Ícones
+        run: npm install @capacitor/assets --save-dev
+
       - name: Inicializar Capacitor e Android
         run: |
           mkdir www
@@ -46,7 +49,7 @@ jobs:
 
       - name: Gerar Ícone do App Android
         run: |
-          npx @capacitor/assets generate --android \
+          npx capacitor-assets generate --android \
             --iconBackgroundColor '#0f172a' \
             --iconBackgroundColorDark '#0f172a' \
             --splashBackgroundColor '#0f172a' \
@@ -56,7 +59,7 @@ jobs:
         run: |
           cd android
           chmod +x gradlew
-          gradle assembleDebug
+          ./gradlew assembleDebug
 
       - name: Fazer upload do APK
         uses: actions/upload-artifact@v4
